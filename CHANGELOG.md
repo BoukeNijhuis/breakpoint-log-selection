@@ -2,6 +2,6 @@
 
 # Breakpoint Log Selection Changelog
 
-
-### Unreleased
+## [Unreleased]
+### Added
 - Initial release
