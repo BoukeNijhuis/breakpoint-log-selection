@@ -1,8 +1,8 @@
 # breakpoint-log-selection
 
 ![Build](https://github.com/BoukeNijhuis/breakpoint-log-selection/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
+[![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/com.github.boukenijhuis.breakpointlogselection)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/com.github.boukenijhuis.breakpointlogselection)
 
 ## Template ToDo list
 - [x] Create a new [IntelliJ Platform Plugin Template][template] project.
@@ -17,11 +17,21 @@
 - [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+Breakpoints can be used for temporary logging. This kind of logging will never accidentally be pushed to your VCS or to production, because a breakpoint is not code. Therefore, you cannot push it.
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
+A breakpoint is a logging breakpoint when it fulfills the following criteria:
+- it is non suspending
+- it has a log expression
 
-To keep everything working, do not remove `<!-- ... -->` sections. 
+If both conditions are true we are talking about a logging breakpoint. These are fantastic tools to use, but there is a downside: you can only create one by clicking with the mouse. This problem is fixed by this plugin.
+
+It works as follows:
+1. select the variable or expression that you would like to log
+2. press the assigned shortcut (default: ctrl-command-F8)
+
+This will create a non suspending breakpoint that will log the selected variable or expression on the next line that support breakpoints. The main reason for the next line is to prevent the logging of empty variables.
+
+The default shortcut can be replaced by assigning a new shortcut to the action 'Log Selection with Breakpoint'.
 <!-- Plugin description end -->
 
 ## Installation
