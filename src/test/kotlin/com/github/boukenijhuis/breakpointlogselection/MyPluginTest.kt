@@ -1,39 +1,35 @@
 package com.github.boukenijhuis.breakpointlogselection
 
-import com.intellij.ide.highlighter.XmlFileType
-import com.intellij.openapi.components.service
-import com.intellij.psi.xml.XmlFile
-import com.intellij.testFramework.TestDataPath
+import com.intellij.testFramework.TestActionEvent
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
-import com.intellij.util.PsiErrorElementUtil
-import com.github.boukenijhuis.breakpointlogselection.services.MyProjectService
+import com.intellij.xdebugger.XDebuggerManager
+import com.intellij.xdebugger.breakpoints.SuspendPolicy
 
-@TestDataPath("\$CONTENT_ROOT/src/test/testData")
 class MyPluginTest : BasePlatformTestCase() {
 
-    fun testXMLFile() {
-        val psiFile = myFixture.configureByText(XmlFileType.INSTANCE, "<foo>bar</foo>")
-        val xmlFile = assertInstanceOf(psiFile, XmlFile::class.java)
+    fun testBreakpointCreation() {
+        myFixture.configureByFiles("Main.java")
+        val manager = XDebuggerManager.getInstance(project).getBreakpointManager();
 
-        assertFalse(PsiErrorElementUtil.hasErrors(project, xmlFile.virtualFile))
+        val breakpointsBefore = manager.getAllBreakpoints().size
 
-        assertNotNull(xmlFile.rootTag)
+        var actionEvent = TestActionEvent(BreakpointLogAction())
+        var action = BreakpointLogAction()
+        action.actionPerformed(actionEvent)
 
-        xmlFile.rootTag?.let {
-            assertEquals("foo", it.name)
-            assertEquals("bar", it.value.text)
-        }
+        val breakpointsAfter = manager.getAllBreakpoints().size
+
+        // there should be one breakpoint extra
+        assertEquals("Expected exactly one created breakpoint.", 1, breakpointsAfter - breakpointsBefore)
+
+        // check the created breakpoint
+        val breakpoint = manager.allBreakpoints.last()
+        assertEquals("Expected the breakpoint to not suspend.", breakpoint.suspendPolicy, SuspendPolicy.NONE)
+        assertNotNull("Expected the breakpoint the have a log expression", breakpoint.logExpressionObject?.expression)
     }
 
-    fun testRename() {
-        myFixture.testRename("foo.xml", "foo_after.xml", "a2")
+    override fun getTestDataPath(): String {
+        return "src/test/testData"
     }
-
-    fun testProjectService() {
-        val projectService = project.service<MyProjectService>()
-
-        assertNotSame(projectService.getRandomNumber(), projectService.getRandomNumber())
-    }
-
-    override fun getTestDataPath() = "src/test/testData/rename"
 }
+
