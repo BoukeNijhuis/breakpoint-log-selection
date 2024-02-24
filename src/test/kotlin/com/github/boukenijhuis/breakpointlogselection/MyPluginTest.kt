@@ -26,6 +26,14 @@ class MyPluginTest : BasePlatformTestCase() {
         val breakpoint = manager.allBreakpoints.last()
         assertEquals("Expected the breakpoint to not suspend.", breakpoint.suspendPolicy, SuspendPolicy.NONE)
         assertNotNull("Expected the breakpoint the have a log expression", breakpoint.logExpressionObject?.expression)
+
+        // call the plugin again to remove the breakpoint
+        action.actionPerformed(actionEvent)
+
+        // there should be no breakpoint extra
+        val breakpointsAfterDouble = manager.getAllBreakpoints().size
+        assertEquals("Expected exactly zero created breakpoint.", 0, breakpointsAfterDouble - breakpointsBefore)
+
     }
 
     override fun getTestDataPath(): String {

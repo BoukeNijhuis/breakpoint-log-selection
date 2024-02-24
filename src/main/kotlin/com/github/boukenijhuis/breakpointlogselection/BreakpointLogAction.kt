@@ -8,6 +8,7 @@ import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.SuspendPolicy
 import com.intellij.xdebugger.impl.XSourcePositionImpl
 import com.intellij.xdebugger.impl.breakpoints.XBreakpointUtil
+import org.jetbrains.concurrency.AsyncPromise
 
 
 class BreakpointLogAction : AnAction() {
@@ -39,10 +40,11 @@ class BreakpointLogAction : AnAction() {
             XBreakpointUtil.toggleLineBreakpoint(project, position, editor, false, false, true)
 
         // update the breakpoint with the log expression
-        if (selectedText != null) {
+        if (selectedText != null && breakpoint is AsyncPromise) {
             breakpoint.then {
-                it.suspendPolicy = SuspendPolicy.NONE
-                it.logExpression = "\"$selectedText = [\" + $selectedText + \"]\""
+                    it.suspendPolicy = SuspendPolicy.NONE
+                    it.logExpression = "\"$selectedText = [\" + $selectedText + \"]\""
+
             }
         }
     }
