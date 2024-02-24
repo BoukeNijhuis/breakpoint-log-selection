@@ -4,18 +4,6 @@
 [![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/com.github.boukenijhuis.breakpointlogselection)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/com.github.boukenijhuis.breakpointlogselection)
 
-## Template ToDo list
-- [x] Create a new [IntelliJ Platform Plugin Template][template] project.
-- [ ] Get familiar with the [template documentation][template].
-- [ ] Adjust the [pluginGroup](./gradle.properties), [plugin ID](./src/main/resources/META-INF/plugin.xml) and [sources package](./src/main/kotlin).
-- [ ] Adjust the plugin description in `README` (see [Tips][docs:plugin-description])
-- [ ] Review the [Legal Agreements](https://plugins.jetbrains.com/docs/marketplace/legal-agreements.html?from=IJPluginTemplate).
-- [ ] [Publish a plugin manually](https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html?from=IJPluginTemplate) for the first time.
-- [ ] Set the `PLUGIN_ID` in the above README badges.
-- [ ] Set the [Plugin Signing](https://plugins.jetbrains.com/docs/intellij/plugin-signing.html?from=IJPluginTemplate) related [secrets](https://github.com/JetBrains/intellij-platform-plugin-template#environment-variables).
-- [ ] Set the [Deployment Token](https://plugins.jetbrains.com/docs/marketplace/plugin-upload.html?from=IJPluginTemplate).
-- [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
-
 <!-- Plugin description -->
 Breakpoints can be used for temporary logging. This kind of logging will never accidentally be pushed to your VCS or to production, because a breakpoint is not code. Therefore, you cannot push it.
 
@@ -23,7 +11,7 @@ A breakpoint is a logging breakpoint when it fulfills the following criteria:
 - it is non suspending
 - it has a log expression
 
-If both conditions are true we are talking about a logging breakpoint. These are fantastic tools to use, but there is a downside: you can only create one by clicking with the mouse. This problem is fixed by this plugin.
+If both conditions are true we are talking about a logging breakpoint. These are fantastic tools to use, but there is a downside: you can only create one by doing multiple clicks with the mouse. With this plugin you can do the same but with a keyboard shortcut.
 
 It works as follows:
 1. select the variable or expression that you would like to log
