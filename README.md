@@ -1,8 +1,8 @@
 # breakpoint-log-selection
 
 ![Build](https://github.com/BoukeNijhuis/breakpoint-log-selection/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/com.github.boukenijhuis.breakpointlogselection)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/com.github.boukenijhuis.breakpointlogselection)
+[![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/23796-log-selection-with-breakpoint/)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/23796-log-selection-with-breakpoint/)
 
 <!-- Plugin description -->
 Breakpoints can be used for temporary logging. This kind of logging will never accidentally be pushed to your VCS or to production, because a breakpoint is not code. Therefore, you cannot push it.
