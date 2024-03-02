@@ -15,6 +15,10 @@ class MyPluginTest : BasePlatformTestCase() {
         testBreakpointCreation(this, "MainEmptyLine.java")
     }
 
+    fun testBreakpointCreationLastLine() {
+        testNoBreakpointCreation(this, "MainLastLine.java")
+    }
+
     override fun getTestDataPath(): String {
         return "src/test/testData"
     }
@@ -49,6 +53,22 @@ class MyPluginTest : BasePlatformTestCase() {
             // there should be no breakpoint extra
             val breakpointsAfterDouble = manager.getAllBreakpoints().size
             assertEquals("Expected exactly zero created breakpoint.", 0, breakpointsAfterDouble - breakpointsBefore)
+        }
+
+        fun testNoBreakpointCreation(myPluginTest: MyPluginTest, fileName: String) {
+            myPluginTest.myFixture.configureByFiles(fileName)
+            val manager = XDebuggerManager.getInstance(myPluginTest.project).getBreakpointManager();
+
+            val breakpointsBefore = manager.getAllBreakpoints().size
+
+            var actionEvent = TestActionEvent(BreakpointLogAction())
+            var action = BreakpointLogAction()
+            action.actionPerformed(actionEvent)
+
+            val breakpointsAfter = manager.getAllBreakpoints().size
+
+            // there should be one breakpoint extra
+            assertEquals("Expected exactly zero created breakpoint.", 0, breakpointsAfter - breakpointsBefore)
         }
     }
 }
