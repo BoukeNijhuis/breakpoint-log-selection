@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.SuspendPolicy
+import com.intellij.xdebugger.impl.XDebuggerUtilImpl
 import com.intellij.xdebugger.impl.XSourcePositionImpl
 import com.intellij.xdebugger.impl.breakpoints.XBreakpointUtil
 import org.jetbrains.concurrency.AsyncPromise
@@ -33,6 +34,11 @@ class BreakpointLogAction : AnAction() {
         var position = currentPosition
         if (selectedText != null) {
             position = nextLinePosition
+        }
+
+        // increase the line number if the determined position does not support a breakpoint
+        while (!XDebuggerUtilImpl().canPutBreakpointAt(project, currentFile, position.line)) {
+            position = XSourcePositionImpl.create(currentFile, position.line + 1)
         }
 
         // always toggle (even if there is no selection)
