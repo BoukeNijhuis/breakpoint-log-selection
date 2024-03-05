@@ -3,6 +3,7 @@
 # Breakpoint Log Selection Changelog
 
 ## [Unreleased]
+- trying to fix the GitHub Actions
 
 ## [0.0.7] - 2024-03-02
 
