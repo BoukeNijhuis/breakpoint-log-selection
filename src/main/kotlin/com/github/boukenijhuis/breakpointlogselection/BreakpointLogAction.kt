@@ -6,11 +6,15 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.xdebugger.XDebuggerUtil
 import com.intellij.xdebugger.XSourcePosition
 import com.intellij.xdebugger.breakpoints.SuspendPolicy
-import com.intellij.xdebugger.impl.XDebuggerUtilImpl
+import com.intellij.xdebugger.breakpoints.XBreakpointManager
+import com.intellij.xdebugger.breakpoints.XLineBreakpoint
+import com.intellij.xdebugger.breakpoints.XBreakpointType
+import com.intellij.xdebugger.breakpoints.XLineBreakpointType
 import com.intellij.xdebugger.impl.XSourcePositionImpl
-import com.intellij.xdebugger.impl.breakpoints.XBreakpointUtil
+// import com.intellij.xdebugger.impl.breakpoints.XBreakpointUtil // Not used anymore
 import org.jetbrains.concurrency.AsyncPromise
 
 
@@ -20,11 +24,65 @@ class BreakpointLogAction : AnAction() {
         return ActionUpdateThread.BGT
     }
 
+    private fun toggleLineBreakpointAsync(
+        project: Project,
+        position: XSourcePosition
+    ): AsyncPromise<XLineBreakpoint<*>?> {
+        val breakpointManager = XBreakpointManager.getInstance(project)
+        val file = position.file
+        val line = position.line
+        val promise = AsyncPromise<XLineBreakpoint<*>?>()
+
+        val lineBreakpointTypes = XBreakpointType.getRegisteredTypes().filterIsInstance<XLineBreakpointType<*>>()
+        if (lineBreakpointTypes.isEmpty()) {
+            promise.setError("No XLineBreakpointType registered.")
+            return promise
+        }
+
+        var existingBreakpoint: XLineBreakpoint<*>? = null
+        for (type in lineBreakpointTypes) {
+            val bp = breakpointManager.findBreakpointAtLine(type, file, line)
+            if (bp != null) {
+                existingBreakpoint = bp
+                break
+            }
+        }
+
+        if (existingBreakpoint != null) {
+            breakpointManager.removeBreakpoint(existingBreakpoint)
+            promise.setResult(null) // Breakpoint removed
+        } else {
+            var suitableType: XLineBreakpointType<*>? = null
+            for (type in lineBreakpointTypes) {
+                // Ensure project is non-null for canPutAt if the type requires it, though XSourcePosition usually has it.
+                if (type.canPutAt(file, line, project)) {
+                    suitableType = type
+                    break
+                }
+            }
+
+            if (suitableType != null) {
+                val properties = suitableType.createBreakpointProperties(file, line)
+                val newBreakpoint = breakpointManager.addLineBreakpoint(
+                    suitableType,
+                    file,
+                    line,
+                    properties,
+                    false // temporary = false
+                )
+                promise.setResult(newBreakpoint)
+            } else {
+                promise.setResult(null) // No suitable type found, resolve with null
+            }
+        }
+        return promise
+    }
+
     override fun actionPerformed(event: AnActionEvent) {
         // get current project and file
         val project = event.project ?: return
         val currentFile = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
-        val editor = event.getRequiredData(CommonDataKeys.EDITOR)
+        val editor = event.getData(CommonDataKeys.EDITOR) ?: return
 
         // determine the position variables
         val offset = editor.caretModel.offset
@@ -50,15 +108,15 @@ class BreakpointLogAction : AnAction() {
         }
 
         // always toggle (even if there is no selection)
-        val breakpoint =
-            XBreakpointUtil.toggleLineBreakpoint(project, position, editor, false, false, true)
+        val breakpointPromise = toggleLineBreakpointAsync(project, position)
 
         // update the breakpoint with the log expression
-        if (selectedText != null && breakpoint is AsyncPromise) {
-            breakpoint.then {
+        if (selectedText != null) { // No need to check if breakpointPromise is AsyncPromise
+            breakpointPromise.then { bp -> // bp is XLineBreakpoint<*>?
+                bp?.let { // Only configure if bp is not null (breakpoint was created or existed and wasn't removed for this path)
                     it.suspendPolicy = SuspendPolicy.NONE
                     it.logExpression = "\"$selectedText = [\" + $selectedText + \"]\""
-
+                }
             }
         }
     }
@@ -67,5 +125,5 @@ class BreakpointLogAction : AnAction() {
         project: Project,
         currentFile: VirtualFile,
         position: XSourcePosition
-    ) = XDebuggerUtilImpl().canPutBreakpointAt(project, currentFile, position.line)
+    ) = XDebuggerUtil.getInstance().canPutBreakpointAt(project, currentFile, position.line)
 }
