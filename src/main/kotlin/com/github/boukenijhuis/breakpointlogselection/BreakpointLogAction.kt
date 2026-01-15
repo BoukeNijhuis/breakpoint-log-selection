@@ -24,7 +24,7 @@ class BreakpointLogAction : AnAction() {
         // get current project and file
         val project = event.project ?: return
         val currentFile = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return
-        val editor = event.getRequiredData(CommonDataKeys.EDITOR)
+        val editor = event.getData(CommonDataKeys.EDITOR) ?: return
 
         // determine the position variables
         val offset = editor.caretModel.offset
@@ -39,7 +39,7 @@ class BreakpointLogAction : AnAction() {
         }
 
         // increase the line number if the determined position does not support a breakpoint
-        while (!isValidBreakpointLocation(project, currentFile, position) ) {
+        while (!isValidBreakpointLocation(project, currentFile, position)) {
             position = XSourcePositionImpl.create(currentFile, position.line + 1)
 
             // when we move past the last line
@@ -56,8 +56,8 @@ class BreakpointLogAction : AnAction() {
         // update the breakpoint with the log expression
         if (selectedText != null && breakpoint is AsyncPromise) {
             breakpoint.then {
-                    it.suspendPolicy = SuspendPolicy.NONE
-                    it.logExpression = "\"$selectedText = [\" + $selectedText + \"]\""
+                it?.suspendPolicy = SuspendPolicy.NONE
+                it?.logExpression = "\"$selectedText = [\" + $selectedText + \"]\""
 
             }
         }
